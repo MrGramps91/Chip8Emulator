@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chip8Emu", "Chip8Emu.vcxproj", "{F01BE67E-4D2F-4546-B775-7A277D4D0092}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F01BE67E-4D2F-4546-B775-7A277D4D0092}.Debug|x64.ActiveCfg = Debug|x64
+		{F01BE67E-4D2F-4546-B775-7A277D4D0092}.Debug|x64.Build.0 = Debug|x64
+		{F01BE67E-4D2F-4546-B775-7A277D4D0092}.Debug|x86.ActiveCfg = Debug|Win32
+		{F01BE67E-4D2F-4546-B775-7A277D4D0092}.Debug|x86.Build.0 = Debug|Win32
+		{F01BE67E-4D2F-4546-B775-7A277D4D0092}.Release|x64.ActiveCfg = Release|x64
+		{F01BE67E-4D2F-4546-B775-7A277D4D0092}.Release|x64.Build.0 = Release|x64
+		{F01BE67E-4D2F-4546-B775-7A277D4D0092}.Release|x86.ActiveCfg = Release|Win32
+		{F01BE67E-4D2F-4546-B775-7A277D4D0092}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {097B56A7-9325-4F7D-A1AF-50F485AD009C}
+	EndGlobalSection
+EndGlobal
