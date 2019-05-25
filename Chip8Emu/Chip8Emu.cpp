@@ -33,21 +33,34 @@ void Chip8::initialize()
 	sp = 0;			// Reset stack pointer
 
 	// Clear display
+	for (int i = 0; i < 2048; i++) 
+		gfx[i] = 0;
+	
+
 	// Clear stack
 	// Clear registers V0-VF
+	for (int i = 0; i < 16; i++) 
+	{
+		stack[i] = 0;
+		V[i] = 0;
+	}
+
 	// Clear memory
+	for (int i = 0; i < 4096 ; i++)
+		memory[i] = 0;
 
 	// Load fontset
 	for (int i = 0; i < 80; i++)
 		memory[i] = chip8_fontset[i];
 
 	// Reset timers
+	delay_timer = 0;
+	sound_timer = 0;
 
 }
 
 void Chip8::loadGame()
 {
-
 	for (int i = 0; i < 1185; i++) //setting bufferSize to 1185 to prevent overflow and set buffer to 1184 bytes availble for Cpu instruction
 		memory[i + 512] = buffer[i];
 }
