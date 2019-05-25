@@ -3,12 +3,13 @@
 #include<iostream>
 #include"Opcodes.h"
 
-class Chip8{
+class Chip8 {
 
 private:
 	unsigned short opcode; //Current opcode
 	unsigned char memory[4096]; // memory 4k
 	unsigned char V[16]; //CPU registers V1-VE
+	unsigned char buffer[1184];  // buffer for loading a program into memory  
 	unsigned short I; //Index register I 
 	unsigned short pc; //Index register pc (program counter)
 	unsigned char gfx[64 * 32]; //gfx has a total of 2048 pixels 
@@ -17,11 +18,11 @@ private:
 	unsigned short stack[16]; // 16 level stack
 	unsigned short sp; // stack pointer
 	unsigned char key[16]; //stores current state of key
-	Chip8 emulateCycle();
-	Chip8 initialize();
-	Chip8 loadGame();
+	void emulateCycle();
+	void initialize();
+	void loadGame();
 
-	unsigned char chip8_fontset[80]=
+	unsigned char chip8_fontset[80] =
 	{
 		0xF0, 0x90, 0x90, 0x90, 0xF0, //0
 		0x20, 0x60, 0x20, 0x20 ,0x70, //1
@@ -39,7 +40,7 @@ private:
 		0xE0, 0x90, 0x90, 0x90 ,0xE0, //D
 		0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
 		0xF0, 0x80, 0xF0, 0x80, 0x80, //E
-	}
+	};
 };
 
 void Chip8::initialize()
@@ -65,7 +66,8 @@ void Chip8::initialize()
 
 void Chip8::loadGame() 
 {
-	for (int i = 0; i < bufferSize; i++)
+	
+	for (int i = 0; i < 1185 ; i++) //setting bufferSize to 1185 to prevent overflow and set buffer to 1184 bytes availble for Cpu instruction
 		memory[i + 512] = buffer[i];
 }
 
@@ -120,6 +122,7 @@ void Chip8::emulateCycle() //fix this qualified class declaration
 			unsigned short y = V[(opcode & 0x00F0) >> 4];
 			unsigned short height = opcode & 0x000F;
 			unsigned short pixel;
+			bool drawFlag = false;
 
 			V[0xF] = 0;
 			for(int yline = 0; yline < height; yline++)
@@ -136,7 +139,7 @@ void Chip8::emulateCycle() //fix this qualified class declaration
 				}
 			}
 			drawFlag = true;
-			pc +=2
+			pc += 2;
 		}
 		break;
 
