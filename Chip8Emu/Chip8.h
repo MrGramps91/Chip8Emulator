@@ -1,7 +1,6 @@
 //.h files contain definitions of Functions and variables, which are imported or un in any C++ program
 
 #include<iostream>
-#include"Opcodes.h"
 
 class Chip8 {
 

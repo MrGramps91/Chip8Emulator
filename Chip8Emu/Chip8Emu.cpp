@@ -33,24 +33,24 @@ void Chip8::initialize()
 	sp = 0;			// Reset stack pointer
 
 	// Clear display
-	for (int i = 0; i < 2048; i++) 
+	for (int i = 0; i < 2048; ++i) 
 		gfx[i] = 0;
 	
 
 	// Clear stack
 	// Clear registers V0-VF
-	for (int i = 0; i < 16; i++) 
+	for (int i = 0; i < 16; ++i) 
 	{
 		stack[i] = 0;
 		V[i] = 0;
 	}
 
 	// Clear memory
-	for (int i = 0; i < 4096 ; i++)
+	for (int i = 0; i < 4096 ; ++i)
 		memory[i] = 0;
 
 	// Load fontset
-	for (int i = 0; i < 80; i++)
+	for (int i = 0; i < 80; ++i)
 		memory[i] = chip8_fontset[i];
 
 	// Reset timers
@@ -61,7 +61,7 @@ void Chip8::initialize()
 
 void Chip8::loadGame()
 {
-	for (int i = 0; i < 1185; i++) //setting bufferSize to 1185 to prevent overflow and set buffer to 1184 bytes availble for Cpu instruction
+	for (int i = 0; i < 1185; ++i) //setting bufferSize to 1185 to prevent overflow and set buffer to 1184 bytes availble for Cpu instruction
 		memory[i + 512] = buffer[i];
 }
 
@@ -73,20 +73,32 @@ void Chip8::emulateCycle()
 	//Decode opcode
 	switch (opcode & 0xF000)
 	{
-	case 0x0000:
+	case 0x0000: // 0x0NNN Calls program at address NNN
 		switch (opcode & 0x000F)
 		{
+
 		case 0x00E0: // 0x00E0: Clears the screen
-			// Execute opcode
+			for (int i = 0; i < 2048; ++i)
+			{
+				gfx[i] = 0;
+			}
+			drawFlag = true;
+			pc += 2;
 			break;
 
 		case  0x00EE: // 0x00EE: Returns from subroutine
-			// Execute opcode
+			--sp;
+			pc = stack[sp];
+			pc += 2;
 			break;
 
 		default:
 			printf("Unknow opcode [0x0000]: 0x%X\n", opcode);
 		}
+		break;
+
+	case 0x1000: // 1NNN jumps to address NNN
+		pc = opcode & 0x0FFF;
 		break;
 
 	case 0x2000: //0x2NNN calls subroutine at address NNN
@@ -95,20 +107,77 @@ void Chip8::emulateCycle()
 		pc = opcode & 0x0FFF;
 		break;
 
-	case 0x0004: //0x8XY4  adds value of VY to VX
-		if (V[opcode & 0x00F0 >> 4] > (0xFF - V[(opcode & 0x0F00) >> 8]))
-			V[0xF] = 1; //Carry
+	case 0x3000: // 0x3XNN Skips the next instruction is VX equals NN.
+		if (V[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF))
+			pc += 4;
 		else
-			V[0xF] = 0;
-		V[(opcode & 0X0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
+			pc += 2;
+		break;
+
+	case 0x4000: //0x4XNN Skips the next instruction if VX does not equal NN
+		if (V[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF))
+			pc += 4;
+		else
+			pc += 2;
+		break;
+
+	case 0x5000: // 0x5XY0 Skips the next instruction if VX == VY
+		if (V[(opcode & 0x0F00) >> 8] == V[(opcode & 0x00F0) >> 4])
+			pc += 4;
+		else
+			pc += 2;
+		break;
+
+	case 0x6000: // 0x6XNN Sets VX to NN
+		V[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
 		pc += 2;
 		break;
 
-	case 0x0033: //store the Binary-coded representation of VX at the addresses I, I+1, I+2
-		memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
-		memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
-		memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
+	case 0x7000: // 0x7XNN Add NN to VX
+		V[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
 		pc += 2;
+		break;
+
+	case 0x8000:
+		switch (opcode & 0x000F)
+		{
+		case 0x0000: //0x8XY0 Sets VX to value of VY
+			V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4];
+			pc += 2;
+			break;
+
+		case 0x0001: //0x8XY1 set VX to VX or VY (Bitwise OR operation)
+			V[(opcode & 0x0F00) >> 8] |= V[(opcode & 0x00F0) >> 4];
+			pc += 2;
+			break;
+
+		case 0x0002: // 0x8XY2 sets VX to (VX AND VY)
+			V[(opcode & 0x0F00) >> 8] &= V[(opcode & 0x00F0) >> 4];
+			pc += 2;
+			break;
+
+		case 0x0003: // 0x8XY3 set VX to (VX XOR VY)
+			V[(opcode & 0x0F00) >> 8] ^= V[(opcode & 0x00F0) >> 4];
+			pc += 2;
+			break;
+
+		case 0x0004: //0x8XY4  adds value of VY to VX
+			if (V[opcode & 0x00F0 >> 4] > (0xFF - V[(opcode & 0x0F00) >> 8]))
+				V[0xF] = 1; //Carry
+			else
+				V[0xF] = 0;
+			V[(opcode & 0X0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
+			pc += 2;
+			break;
+		}
+		break;
+
+	case 0x0033: //store the Binary-coded representation of VX at the addresses I, I+1, I+2
+			memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
+			memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
+			memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
+			pc += 2;
+		
 
 	case 0xD000: // Drawing pixels/sprites at specific locations
 	{
