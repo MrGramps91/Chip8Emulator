@@ -169,6 +169,26 @@ void Chip8::emulateCycle()
 			V[(opcode & 0X0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
 			pc += 2;
 			break;
+
+		case 0x0005:
+			// Execute code //
+			break;
+
+		case 0x0006:
+			// Execute code //
+			break;
+
+		case 0x0007:
+			// Execute code //
+			break;
+
+		case 0x000E:
+			// Execute code //
+			break;
+
+		default:
+			printf("*\nUnkown opcode: %.4X\n", opcode);
+				exit(3);
 		}
 		break;
 
