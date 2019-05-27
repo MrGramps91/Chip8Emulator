@@ -59,11 +59,11 @@ void Chip8::initialize()
 
 }
 
-void Chip8::loadGame()
-{
-	for (int i = 0; i < 1185; ++i) //setting bufferSize to 1185 to prevent overflow and set buffer to 1184 bytes availble for Cpu instruction
-		memory[i + 512] = buffer[i];
-}
+//void Chip8::loadGame()
+//{
+//	for (int i = 0; i < 1184; ++i) //setting bufferSize to 1185 to prevent overflow and set buffer to 1184 bytes availble for Cpu instruction
+//		memory[i + 512] = buffer[i];
+//}
 
 void Chip8::emulateCycle()
 {
@@ -74,10 +74,11 @@ void Chip8::emulateCycle()
 	switch (opcode & 0xF000)
 	{
 	case 0x0000: // 0x0NNN Calls program at address NNN
+
 		switch (opcode & 0x000F)
 		{
 
-		case 0x00E0: // 0x00E0: Clears the screen
+		case 0x0000: // 0x00E0: Clears the screen
 			for (int i = 0; i < 2048; ++i)
 			{
 				gfx[i] = 0;
@@ -86,7 +87,7 @@ void Chip8::emulateCycle()
 			pc += 2;
 			break;
 
-		case  0x00EE: // 0x00EE: Returns from subroutine
+		case  0x000E: // 0x00EE: Returns from subroutine
 			--sp;
 			pc = stack[sp];
 			pc += 2;
@@ -94,6 +95,7 @@ void Chip8::emulateCycle()
 
 		default:
 			printf("Unknow opcode [0x0000]: 0x%X\n", opcode);
+			exit(3);
 		}
 		break;
 
@@ -197,7 +199,7 @@ void Chip8::emulateCycle()
 			memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
 			memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
 			pc += 2;
-		
+			break;
 
 	case 0xD000: // Drawing pixels/sprites at specific locations
 	{
@@ -226,19 +228,22 @@ void Chip8::emulateCycle()
 	}
 	break;
 
-	case 0XE000:
-	{
-		//EX9E: Skips the next instruction
+	case 0xE000:
+		switch (opcode & 0x000F)
+		{
+			//EX9E: Skips the next instruction
 		// if the key stored in VX is pressed
-	case 0x009E:
-		if (key[V[(opcode & 0x0F00) >> 8]] != 0)
-			pc += 4;
-		else
-			pc += 2;
+		case 0x009E:
+			if (key[V[(opcode & 0x0F00) >> 8]] != 0)
+				pc += 4;
+			else
+				pc += 2;
+			break;
+		
+		}
 		break;
-	}
-	// More opcode //
 
+	// More opcode //
 
 	case 0xA000: // ANNN: Sets I to the address NNN
 		//Execute opcode	
