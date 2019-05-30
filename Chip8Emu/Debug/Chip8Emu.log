@@ -1,0 +1,7 @@
+﻿  Chip8Emu.cpp
+  main.cpp
+D:\Visual Studio\repos\Chip8EmuTesting\Chip8Emu\Chip8Emu.cpp(69): error C1075:  '{': no matching token found
+D:\Visual Studio\repos\Chip8EmuTesting\Chip8Emu\main.cpp(32,1): error C2144:  syntax error: 'int' should be preceded by ';'
+D:\Visual Studio\repos\Chip8EmuTesting\Chip8Emu\main.cpp(59,5): error C2065:  'SDL_WINDOW_UNDEFINED': undeclared identifier
+  Generating Code...
+D:\Visual Studio\repos\Chip8EmuTesting\Chip8Emu\main.cpp(62,1): error C2143:  syntax error: missing ';' before '}'
