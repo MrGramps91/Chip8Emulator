@@ -59,11 +59,59 @@ void Chip8::initialize()
 
 }
 
-//void Chip8::loadGame()
-//{
-//	for (int i = 0; i < 1184; ++i) //setting bufferSize to 1185 to prevent overflow and set buffer to 1184 bytes availble for Cpu instruction
-//		memory[i + 512] = buffer[i];
-//}
+// initialise and load ROM into memory
+bool Chip8::loadGame(const char *file_path) 
+{
+	initialize();
+	printf("Loading ROM: %s\n", file_path);
+
+	// Open ROM File
+	FILE* rom = fopen(file_path, "rb");
+	if (rom == NULL)
+	{
+		std::cerr << "Failed to open ROM" << std::endl;
+		return false;
+	}
+
+	//Get file size
+	fseek(rom, 0, SEEK_END);
+	long rom_size = ftell(rom);
+	rewind(rom);
+
+	//Allocate memory to store rom
+	char* rom_buffer = (char*)malloc(sizeof(char) * rom_size);
+	if (rom_buffer == NULL)
+	{
+		std::cerr << "Failed to allocate memory for ROM" << std::endl;
+		return false;
+	}
+		//Copy ROM into buffer
+		size_t result = fread(rom_buffer, sizeof(char), (size_t)rom_size, rom);
+		if (result != rom_size)
+		{
+			std::cerr << "Failed to read ROM" << std::endl;
+			return false;
+		}
+
+		// Copy buffer to memery
+		if ((4096 - 512) > rom_size)
+		{
+			for (int i = 0; i < rom_size; ++i)
+			{
+				memory[i + 512] = (uint8_t)rom_buffer[i];
+			}
+		}
+		else
+		{
+			std::cerr << "ROM too large to fit in memory" << std::endl;
+			return false;
+		}
+	
+		// Clean up
+		fclose(rom);
+		free(rom_buffer);
+
+}
 
 void Chip8::emulateCycle()
 {
